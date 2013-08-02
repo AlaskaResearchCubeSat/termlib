@@ -135,7 +135,6 @@ void terminal(void *p) __toplevel{
     //kill task
     ctl_task_die();
   }
-  printf("\rTesting\r\n");
   printf("\r%s\r\n>",spec->startMsg);
   for(;;){
     //get character
