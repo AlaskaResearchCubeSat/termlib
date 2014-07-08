@@ -107,7 +107,7 @@ short hist_decr(short h){
 
 //task to communicate with the user over USB
 void terminal(void *p) __toplevel{
-  TERM_SPEC *spec=p;
+  char *msg=p;
   //character from port
   int c=0;
   //buffer for command
@@ -128,17 +128,13 @@ void terminal(void *p) __toplevel{
   /*for(i=0;i<HISTORY_SIZE;i++){
     history[i][0]=0;
   }*/
-  //check for NULL
-  if(spec==NULL){
-    //print error
-    printf("\rNULL pointer passed to \"%s\" task\r\n",ctl_task_executing->name);
-    //kill task
-    ctl_task_die();
+  if(msg!=NULL){
+      //print message
+      printf("\r%s\r\n>",msg);
   }
-  printf("\r%s\r\n>",spec->startMsg);
   for(;;){
     //get character
-    c=spec->inputFCN();
+    c=getchar();
     //check for EOF
     if(c==EOF){
       //EOF returned, input is not ready. wait a bit

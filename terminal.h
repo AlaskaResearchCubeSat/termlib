@@ -8,11 +8,6 @@
     //function pointer to command
     int (*cmd)(char **argv,unsigned short argc);
   }CMD_SPEC;
-
-  typedef struct{
-    const char *startMsg;
-    int (*inputFCN)(void);
-  }TERM_SPEC;
   
   //table of commands with help
   extern const CMD_SPEC cmd_tbl[];
