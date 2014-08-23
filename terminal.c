@@ -6,6 +6,15 @@
 #include <ctl.h>
 #include "terminal.h"
 
+#define CMD_LEN           64
+
+#ifdef HISTORY
+    #ifndef CTL_PROC
+        #error HISTORY must be used with CTL_PROC
+    #endif
+    #define HISTORY_SIZE      10
+#endif
+
 //used to break up a string into arguments for parsing
 //*argv[] is a vector for the arguments and contains pointers to each argument
 //*dst is a buffer that needs to be big enough to hold all the arguments
@@ -83,12 +92,10 @@ int doCmd(const char *cs){
   return 1;
 }
 
-#define CMD_LEN           64
-#define HISTORY_SIZE      10
-
 //prototype for __putchar to make the compiler happy
 int __putchar(int __c);
 
+#ifdef HISTORY
 short hist_incr(short h){
   h++;
   if(h>=HISTORY_SIZE){
@@ -104,6 +111,7 @@ short hist_decr(short h){
   }
   return h;
 }
+#endif
 
 //task to communicate with the user over USB
 void terminal(void *p) __toplevel{
@@ -112,22 +120,28 @@ void terminal(void *p) __toplevel{
   int c=0;
   //buffer for command
   char cmd[CMD_LEN];
+#ifdef HISTORY
   //buffer for command history
   static char history[HISTORY_SIZE][CMD_LEN];
   short hist_idx=0,hist_lookback=0;
+#endif
+#ifdef CTL_PROC
   //for parsing escape codes
   short esc_idx=-2,num;
   CTL_TIME_t esctime;
   char escbuffer[10],cmd_id;
+#endif
   int i;
   //command string index
   unsigned int cIdx=0;
   //initialize command and history buffers
   cmd[0]=0;
+#ifdef HISTORY
   memset(history,0,sizeof(history));
   /*for(i=0;i<HISTORY_SIZE;i++){
     history[i][0]=0;
   }*/
+#endif
   if(msg!=NULL){
       //print message
       printf("\r%s\r\n>",msg);
@@ -141,11 +155,13 @@ void terminal(void *p) __toplevel{
       ctl_timeout_wait(ctl_get_current_time()+1024);
       continue;
     }
+#ifdef CTL_PROC
     if(esc_idx>-2 && (ctl_get_current_time()-esctime)>10){
       //printf("Timeout\r\n");
       esc_idx=-2;
     }
     if(esc_idx==-2){
+#endif
       //process received character
       switch(c){
         case '\r':
@@ -162,10 +178,12 @@ void terminal(void *p) __toplevel{
             //run command from buffer
             cmd[cIdx]=0;    //terminate command string
             cIdx=0;         //reset the command index
+#ifdef HISTORY
             //save command in history
             hist_idx=hist_incr(hist_idx);
             strcpy(history[hist_idx],cmd);
             hist_lookback=hist_idx;
+#endif
           }
           //send carriage return and new line
           printf("\r\n");
@@ -185,13 +203,16 @@ void terminal(void *p) __toplevel{
           continue;
         case '\t':
           //ignore tab character
-          continue;
+          continue;          
+#ifdef CTL_PROC
         case 0x1B://escape char
           //start processing escape sequence
           esc_idx=-1;
           esctime=ctl_get_current_time();
           continue;
+#endif
       }
+#ifdef CTL_PROC
       //check for control char
       if(!iscntrl(c) && cIdx<(sizeof(cmd)/sizeof(cmd[0]) - 1)){
         //echo character
@@ -227,6 +248,7 @@ void terminal(void *p) __toplevel{
               //get argument
               num=escbuffer[0];
             }
+#ifdef HISTORY
             //check for end of history
             if(hist_decr(hist_lookback)==hist_idx || history[hist_lookback][0]=='\0'){
               putchar(0x07);
@@ -237,6 +259,7 @@ void terminal(void *p) __toplevel{
             strcpy(cmd,history[hist_lookback]);
             cIdx=strlen(cmd);
             hist_lookback=hist_decr(hist_lookback);
+#endif
           break;
           case 'B':
             //CUD - Cursor Down
@@ -248,6 +271,7 @@ void terminal(void *p) __toplevel{
               //get argument
               num=escbuffer[0];
             }
+#ifdef HISTORY
             //check for end of history
             if(hist_lookback==hist_idx){
               putchar(0x07);
@@ -259,6 +283,7 @@ void terminal(void *p) __toplevel{
             printf("\r\x1B[0K>%s",history[hist_lookback]);
             strcpy(cmd,history[hist_lookback]);
             cIdx=strlen(cmd);
+#endif
           break;
           case 'C':
             //CUF - Cursor Forward
@@ -320,6 +345,7 @@ void terminal(void *p) __toplevel{
       }
       esc_idx++;
     }
+#endif
   } 
 }
 

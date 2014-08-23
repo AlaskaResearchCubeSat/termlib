@@ -9,7 +9,7 @@ lib=os.path.join(prefix,"lib")
 include=os.path.join(prefix,"include")
 basename="termlib"
 
-for folder in ("MSP430 Release","MSP430 Debug"):
+for folder in ("MSP430 Release","MSP430 Debug","MSP430 Release Compact","MSP430 Debug Compact"):
     outname=basename+"_"+"_".join(folder.split()[1:])+".hza"
     outpath=os.path.join(lib,outname)
     inpath=os.path.join(inputDir,os.path.join(folder,basename+".hza"))
