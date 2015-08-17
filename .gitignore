@@ -3,7 +3,7 @@
 *.hzs
 
 #build directories
-MSP430 Debug/
-MSP430 Release/
-MSP430 Debug Compact/
-MSP430 Release Compact/
+termlib MSP430 Debug/
+termlib MSP430 Release/
+termlib MSP430 Debug Compact/
+termlib MSP430 Release Compact/
