@@ -3,7 +3,7 @@
   <project Name="termlib">
     <configuration
       Name="Common"
-	  c_preprocessor_definitions="CTL_TASKING"
+      libctl="Yes"
       msp430_insn_set="MSP430X"
       msp430_memory_size="1M"
       build_use_hardware_multiplier="32-Bit Multiplier"
