@@ -12,14 +12,12 @@
       project_type="Library" />
     <folder Name="Source Files">
       <configuration Name="Common" filter="c;h;s;asm;inc;s43" />
-      <file file_name="terminal.c">
-        <configuration Name="Full-Feature" c_preprocessor_definitions="" />
-      </file>
+      <file file_name="terminal.c"/>
       <file file_name="terminal.h" />
     </folder>
     <configuration
       Name="Full-Feature"
-      c_preprocessor_definitions="HISTORY" />
+      c_preprocessor_definitions="CTL_PROC;HISTORY" />
   </project>
   <configuration
     Name="MSP430 Debug"
